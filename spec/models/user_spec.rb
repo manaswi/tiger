@@ -8,6 +8,8 @@
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #  password_digest :string(255)
+#  remember_token  :string(255)
+#  admin           :boolean          default(FALSE)
 #
 
 require 'spec_helper'
@@ -56,7 +58,7 @@ describe User do
     it { should_not be_valid }
   end
 
-describe "when email format is invalid" do
+  describe "when email format is invalid" do
     it "should be invalid" do
       addresses = %w[user@foo,com user_at_foo.org example.user@foo.
                      foo@bar_baz.com foo@bar+baz.com]
@@ -124,5 +126,15 @@ describe "when email format is invalid" do
     before { @user.save }
     its(:remember_token) { should_not be_blank }
   end
-
+   
+  describe "accessible attributes" do
+    #let(:user) { FactoryGirl.create(:user) }
+    it "should not allow access to admin" do
+      expect do
+        @user = User.new(name: "Example User", email: "user@example.com", 
+                     password: "foobar", password_confirmation: "foobar",
+                     admin: true) 
+        end.to raise_error(ActiveModel::MassAssignmentSecurity::Error)
+    end    
+  end  
 end
